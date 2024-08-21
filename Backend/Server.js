@@ -4,9 +4,12 @@ const express = require('express');
 const app = express();
 //Call cors
 const cors = require('cors')
+//Call body-parser
+const bodyParser = require('body-parser');
 //Middleware
 app.use(cors())
 app.use(express.json()); // Upcoming req to Json
+app.use(bodyParser.json());
 //Connect Db
 const dbconnect = require('../Backend/DbConnect');
 //Import Router

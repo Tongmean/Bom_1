@@ -26,12 +26,31 @@ const postBom = async (req, res) =>{
         [Code_Fg, Name_Fg, Code_Dr, Name_Dr,Code_Wip, Name_Wip, Remark],
         (Error,result)=>{
             if(Error){
-                console.log(Error);
+                res.status(400).json({Error: Error.message})
             }else
-            res.status(201).send("bom created");
+            res.send("bom created");
         }
     )
 };
+// Input by using excel
+const postBomExcel = async (req, res) =>{
+    //get value form request(Http)
+    let data =req.body;  // Array 
+    //Check if colum blank add "-"
+    data = data.map(row => row.map(value => value === "" || value === null ? "-" : value));
+    const sqlCommand = "INSERT INTO bom(Code_Fg, Name_Fg, Code_Dr, Name_Dr,Code_Wip, Name_Wip, Remark) VALUES ?";
+    dbconnect.query(sqlCommand,
+        [data],
+        (Error,result)=>{
+            if(Error){
+                res.status(400).json({Error: Error.message})
+                console.log(Error)
+            }else
+            res.send("bom created");
+        }
+    )
+};
+//update bom by Puut Method
 const updatebom = async (req, res) =>{
     //get value form request(Http)
     const id = req.body.id;
@@ -50,7 +69,20 @@ const updatebom = async (req, res) =>{
             console.log(err);
         }else{
             res.status(200).send("bom updated");
-            console.log(result)
+        }
+    })
+};
+//Delect Record bom
+const deletebom = async (req, res) =>{
+    const id = req.params.id
+
+    dbconnect.query("DELETE FROM bom WHERE id = ? ", id, 
+    (err, result)=>{
+        if(err){
+            res.status(400).json({error: error.message})
+        }else{
+            res.status(200).send(`Record ${id} was deleted`);
+            // res.send("Delete Success");
         }
     })
 };
@@ -58,5 +90,7 @@ const updatebom = async (req, res) =>{
 module.exports ={
     getBoms,
     postBom,
-    updatebom
+    updatebom,
+    deletebom,
+    postBomExcel
 }
